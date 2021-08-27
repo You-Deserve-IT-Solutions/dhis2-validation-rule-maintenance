@@ -1,0 +1,5 @@
+.validation-rule-form-container .left-side,
+.validation-rule-form-container .right-side {
+  border: solid 1px #eee;
+  padding: 10px;
+}
