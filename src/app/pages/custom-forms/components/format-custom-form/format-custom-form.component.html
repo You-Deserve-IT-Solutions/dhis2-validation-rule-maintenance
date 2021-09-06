@@ -1,4 +1,11 @@
-<div class="custom-form" class="row">
+<div
+  class="custom-form"
+  class="row"
+  *ngIf="{
+    expressionDescriptionLeft: expressionDescriptionLeft$ | async,
+    expressionDescriptionRight: expressionDescriptionRight$ | async
+  } as params"
+>
   <div class="col-12">
     <div>
       <mat-form-field
@@ -10,7 +17,7 @@
           name="searchString"
           placeholder="Select form"
         >
-          <ngx-mat-select-search name="search"></ngx-mat-select-search>
+          <!-- <ngx-mat-select-search name="search"></ngx-mat-select-search> -->
           <mat-option *ngFor="let option of dataSets" [value]="option">
             {{ option.name }}
           </mat-option>
@@ -39,15 +46,21 @@
     <div class="row" *ngIf="_htmlMarkup">
       <div class="col-md-8">
         <div
-          style="width: 100%; height: 100vh; overflow: auto"
+          style="width: 100%; height: 80vh; overflow: auto"
           [innerHtml]="_htmlMarkup"
         ></div>
       </div>
       <di class="col-md-4" style="border-left: solid 1px #eee">
-        <div class="validation-rule-form-container">
+        <div class="validation-rule-form-container rule-form-create">
           <mat-form-field class="w-100">
             <mat-label>Name*</mat-label>
-            <input matInput placeholder="Name*" />
+            <input
+              class="form-control"
+              name="name"
+              [(ngModel)]="name"
+              matInput
+              placeholder="Name*"
+            />
           </mat-form-field>
 
           <mat-form-field class="w-100">
@@ -59,32 +72,141 @@
             <textarea matInput></textarea>
           </mat-form-field>
 
+          <mat-form-field class="w-100">
+            <mat-label>Instruction</mat-label>
+            <textarea matInput></textarea>
+          </mat-form-field>
+
+          <mat-form-field class="w-100">
+            <mat-label>Importance</mat-label>
+            <mat-select>
+              <mat-option
+                *ngFor="let option of importanceOptions"
+                [value]="option"
+                >{{ option?.name }}</mat-option
+              >
+            </mat-select>
+          </mat-form-field>
+
           <br />
           <h5>Left side</h5>
           <div class="left-side">
             <mat-form-field class="w-100">
-              <mat-label>Left side description*</mat-label>
-              <textarea matInput></textarea>
+              <mat-label>Description*</mat-label>
+              <input matInput placeholder="Description" />
             </mat-form-field>
-
             <mat-form-field class="w-100">
-              <mat-label>Left side expression*</mat-label>
-              <textarea matInput rows="4"></textarea>
+              <mat-label>Expression *</mat-label>
+              <textarea
+                id="left-side-expression"
+                (click)="setActiveExpressionArea($event, 'LEFT')"
+                matInput
+                rows="2"
+                [(ngModel)]="leftSideExpression"
+              ></textarea>
             </mat-form-field>
+            <div
+              class="w-100 d-flex justify-content-between sign-btns-container"
+            >
+              <button (click)="getSignValue($event, '+')" class="sign-btns">
+                <img
+                  height="20"
+                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAABmJLR0QA/wD/AP+gvaeTAAAAWklEQVRoge3XsQ2AMAwAwcD+O0NPA02sF7obwMkrjbMWALCOzfOvqfPOXYOnCakRUiOkRkiNkBohNV+30ecWO+31nr95ESE1fog1QmqE1AipEVIjpEYIABB0A2/0Az6X8bpXAAAAAElFTkSuQmCC"
+                />
+              </button>
+            </div>
+            <p
+              [ngClass]="{
+                'text-danger':
+                  params?.expressionDescriptionLeft?.status === 'ERROR'
+              }"
+            >
+              {{
+                params?.expressionDescriptionLeft?.status === 'OK'
+                  ? params?.expressionDescriptionLeft?.description
+                  : params?.expressionDescriptionLeft?.message
+              }}
+            </p>
           </div>
+          <br />
+
+          <mat-form-field class="w-100">
+            <mat-label>Operator</mat-label>
+            <mat-select>
+              <mat-option *ngFor="let option of operators" [value]="option">{{
+                option?.name
+              }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
           <br />
           <h5>Right side</h5>
           <div class="right-side">
             <mat-form-field class="w-100">
-              <mat-label>Right side description*</mat-label>
-              <textarea matInput></textarea>
+              <mat-label>Description*</mat-label>
+              <input matInput placeholder="Description" />
             </mat-form-field>
 
             <mat-form-field class="w-100">
-              <mat-label>Right side expression*</mat-label>
-              <textarea matInput rows="4"></textarea>
+              <mat-label>Expression*</mat-label>
+              <textarea
+                id="right-side-expression"
+                (click)="setActiveExpressionArea($event, 'RIGHT')"
+                matInput
+                [(ngModel)]="rightSideExpression"
+                rows="2"
+              ></textarea>
             </mat-form-field>
+
+            <div
+              class="w-100 d-flex justify-content-between sign-btns-container"
+            >
+              <button (click)="getSignValue($event, '+')" class="sign-btns">
+                <img
+                  height="20"
+                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAABmJLR0QA/wD/AP+gvaeTAAAAWklEQVRoge3XsQ2AMAwAwcD+O0NPA02sF7obwMkrjbMWALCOzfOvqfPOXYOnCakRUiOkRkiNkBohNV+30ecWO+31nr95ESE1fog1QmqE1AipEVIjpEYIABB0A2/0Az6X8bpXAAAAAElFTkSuQmCC"
+                />
+              </button>
+            </div>
+            <p
+              [ngClass]="{
+                'text-danger':
+                  params?.expressionDescriptionRight?.status === 'ERROR'
+              }"
+            >
+              {{
+                params?.expressionDescriptionRight?.status === 'OK'
+                  ? params?.expressionDescriptionRight?.description
+                  : params?.expressionDescriptionRight?.message
+              }}
+            </p>
           </div>
+
+          <br />
+
+          <div>
+            <h5>Organisation unit levels</h5>
+            <div class="row">
+              <div class="col-5"></div>
+              <div class="col-2"></div>
+              <div class="col-5"></div>
+            </div>
+          </div>
+
+          <br />
+          <section>
+            <mat-checkbox>Skip this rule during form validation</mat-checkbox>
+          </section>
+        </div>
+        <div class="d-flex justify-content-end">
+          <button mat-stroked-button class="mr-2">Cancel</button>
+          <button
+            class="mr-2"
+            mat-stroked-button
+            (click)="onSaveValidationRule($event)"
+          >
+            Save
+          </button>
         </div>
       </di>
     </div>

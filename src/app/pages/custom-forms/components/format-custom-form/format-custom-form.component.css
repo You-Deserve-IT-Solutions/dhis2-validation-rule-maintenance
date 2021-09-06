@@ -3,3 +3,24 @@
   border: solid 1px #eee;
   padding: 10px;
 }
+
+.rule-form-create {
+  height: 80vh;
+  overflow: auto;
+}
+
+.sign-btns {
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+}
+
+button:hover {
+  outline: none !important;
+}
+
+.sign-btns-container {
+  margin-bottom: 15px;
+  padding: 2px 2px 6px 2px;
+  border: solid 1px #eee;
+}

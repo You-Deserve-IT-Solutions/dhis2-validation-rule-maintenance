@@ -23,12 +23,14 @@ import { sharedComponents } from '.';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     MatButtonModule,
     MatCardModule,
     MatChipsModule,
@@ -50,9 +52,11 @@ import { ReactiveFormsModule } from '@angular/forms';
     NgxMatSelectSearchModule,
     DragDropModule,
     MatProgressSpinnerModule,
+    MatDialogModule,
   ],
   exports: [
     ReactiveFormsModule,
+    FormsModule,
     MatButtonModule,
     MatCardModule,
     MatChipsModule,
@@ -74,6 +78,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     NgxMatSelectSearchModule,
     DragDropModule,
     MatProgressSpinnerModule,
+    MatDialogModule,
     ...sharedComponents,
   ],
   declarations: [...sharedComponents],
