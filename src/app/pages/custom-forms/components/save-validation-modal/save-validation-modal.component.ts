@@ -7,11 +7,12 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
   styleUrls: ['./save-validation-modal.component.css'],
 })
 export class SaveValidationModalComponent implements OnInit {
+  public data;
   constructor(
     private dialogRef: MatDialogRef<SaveValidationModalComponent>,
     @Inject(MAT_DIALOG_DATA) data
   ) {
-    console.log(data);
+    this.data = data;
   }
 
   ngOnInit(): void {}

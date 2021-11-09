@@ -59,6 +59,8 @@ export class FormatCustomFormComponent implements OnInit {
   isLeftSideSet: boolean = false;
   currentExpression: string = '';
   metadataIds: string[] = [];
+  leftSideMetadataIds: string[] = [];
+  RightSideMetadataIds: string[] = [];
   uids: string[] = [];
   expressionDescriptionRight$: Observable<any>;
   expressionDescriptionLeft$: Observable<any>;
@@ -70,6 +72,33 @@ export class FormatCustomFormComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {}
+
+  getExpressionDefinition(event, expressionPart): void {
+    const expression = event.target.value;
+    if (expressionPart === 'LEFT') {
+      this.isRightSideSet = false;
+      this.isLeftSideSet = true;
+    } else {
+      this.isRightSideSet = true;
+      this.isLeftSideSet = false;
+    }
+
+    let self = this;
+
+    if (self.isLeftSideSet) {
+      self.leftSideExpression = expression;
+      self.expressionDescriptionLeft$ =
+        self.metadataExpressionDescriptionService.getMetadataExpressionDescription(
+          expression
+        );
+    } else {
+      self.rightSideExpression = expression;
+      self.expressionDescriptionRight$ =
+        self.metadataExpressionDescriptionService.getMetadataExpressionDescription(
+          expression
+        );
+    }
+  }
 
   onSelectionChange(item): void {
     // let expression = '<input disabled="disabled" id="aI75w49azlp" indicatorformula="(#{o0KObJuu9Yu.o9Oj5Cjekej}+#{o0KObJuu9Yu.ZU3sKDB9i2o})/(1)" name="indicatorFormula" readonly="readonly" style="width:3.5em;text-align:center/" />';
@@ -85,26 +114,36 @@ export class FormatCustomFormComponent implements OnInit {
         function (event: any) {
           if (event.target.name == 'entryfield') {
             document.getElementById(event.target.id).style.backgroundColor =
-              '#36e1f2';
-            self.metadataIds = [
-              ...self.metadataIds,
-              '#{' +
-                event.target.id.split('-').join('.').replace('.val', '') +
-                '}',
-            ];
+              self.isLeftSideSet
+                ? '#36e1f2'
+                : self.isRightSideSet
+                ? '#3667f2'
+                : '';
 
             if (self.isLeftSideSet) {
-              self.leftSideExpression = self.metadataIds.join('');
+              self.leftSideExpression =
+                (self.leftSideExpression ? self.leftSideExpression : '') +
+                '#{' +
+                event.target.id.split('-').join('.').replace('.val', '') +
+                '}';
               self.expressionDescriptionLeft$ =
                 self.metadataExpressionDescriptionService.getMetadataExpressionDescription(
-                  self.metadataIds.join('')
+                  self.leftSideExpression
                 );
-            } else {
-              self.rightSideExpression = self.metadataIds.join('');
+            } else if (self.isRightSideSet) {
+              self.rightSideExpression =
+                (self.rightSideExpression ? self.rightSideExpression : '') +
+                '#{' +
+                event.target.id.split('-').join('.').replace('.val', '') +
+                '}';
               self.expressionDescriptionRight$ =
                 self.metadataExpressionDescriptionService.getMetadataExpressionDescription(
-                  self.metadataIds.join('')
+                  self.rightSideExpression
                 );
+            } else {
+              // No side selected
+              self.leftSideExpression = '';
+              self.rightSideExpression = '';
             }
           } else {
           }
@@ -117,9 +156,13 @@ export class FormatCustomFormComponent implements OnInit {
     }
   }
 
-  getSignValue(event: Event, operator) {
+  getSignValue(event: Event, operator, expressionPart, expression) {
     event.stopPropagation();
-    this.metadataIds = [...this.metadataIds, operator];
+    if (expressionPart == 'LEFT') {
+      this.leftSideExpression = expression + ' ' + operator + ' ';
+    } else {
+      this.rightSideExpression = expression + ' ' + operator + ' ';
+    }
     this.curretOperatorId = operator;
   }
 
@@ -128,11 +171,9 @@ export class FormatCustomFormComponent implements OnInit {
     if (expressionPart === 'LEFT') {
       this.isRightSideSet = false;
       this.isLeftSideSet = true;
-      this.metadataIds = [];
     } else {
       this.isRightSideSet = true;
       this.isLeftSideSet = false;
-      this.metadataIds = [];
     }
   }
 

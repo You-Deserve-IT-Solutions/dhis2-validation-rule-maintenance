@@ -1,1 +1,11 @@
-<p>save-validation-modal works!</p>
+<h3 mat-dialog-title>Confirm saving validation rule</h3>
+<mat-dialog-content
+  >Are you sure to save
+  <b>
+    {{ data?.name }}
+  </b></mat-dialog-content
+>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-button>Confirm</button>
+</mat-dialog-actions>
