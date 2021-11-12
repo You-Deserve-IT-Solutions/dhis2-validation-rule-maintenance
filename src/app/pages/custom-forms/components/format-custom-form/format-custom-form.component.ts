@@ -6,6 +6,8 @@ import * as _ from 'lodash';
 import { SaveValidationModalComponent } from '../save-validation-modal/save-validation-modal.component';
 import { MetadataDescriptionService } from 'src/app/core/services/metadata-description.service';
 import { Observable } from 'rxjs';
+import { ValidationRulesService } from 'src/app/core/services/validation-rules.service';
+import { DataelementsService } from 'src/app/core/services/dataelements.service';
 
 @Component({
   selector: 'app-format-custom-form',
@@ -14,44 +16,64 @@ import { Observable } from 'rxjs';
 })
 export class FormatCustomFormComponent implements OnInit {
   @Input() dataSets: any;
-
+  validationRuleId: string;
   searchString: string = '';
   _htmlMarkup: SafeHtml;
   dataSetCtrl: FormControl = new FormControl('');
   dataset: any;
   importanceOptions = [
     {
-      id: 'high',
+      id: 'HIGH',
       name: 'High',
     },
     {
-      id: 'medium',
+      id: 'MEDIUM',
       name: 'Medium',
     },
     {
-      id: 'low',
+      id: 'LOW',
       name: 'Low',
+    },
+  ];
+
+  periodTypes = [
+    {
+      id: 'Monthly',
+      name: 'Monthly',
+    },
+    {
+      id: 'Quarterly',
+      name: 'Quarterly',
     },
   ];
 
   operators = [
     {
-      id: '==',
+      id: 'equal_to',
       name: 'Equal to',
     },
     {
-      id: '!=',
+      id: 'not_equal_to',
       name: 'Not Equal to',
+    },
+    {
+      id: 'less_than',
+      name: 'Less than',
+    },
+    {
+      id: 'greater_than_or_equal_to',
+      name: 'Greater than or equal to',
     },
   ];
   name: string;
   shortName: string;
   description: string;
   instruction: string;
-  importance: string;
+  importance: any;
+  periodType: any;
   leftSideDescription: string;
   leftSideExpression: string;
-  operator: string;
+  operator: any;
   rightSideDescription: string;
   rightSideExpression: string;
   shouldSkipValidation: boolean;
@@ -65,10 +87,13 @@ export class FormatCustomFormComponent implements OnInit {
   expressionDescriptionRight$: Observable<any>;
   expressionDescriptionLeft$: Observable<any>;
   curretOperatorId: string;
+  selectedTab = new FormControl(0);
   constructor(
     private sanitizer: DomSanitizer,
     private dialog: MatDialog,
-    private metadataExpressionDescriptionService: MetadataDescriptionService
+    private metadataExpressionDescriptionService: MetadataDescriptionService,
+    private validationRuleService: ValidationRulesService,
+    private dataElementService: DataelementsService
   ) {}
 
   ngOnInit(): void {}
@@ -177,14 +202,155 @@ export class FormatCustomFormComponent implements OnInit {
     }
   }
 
+  onClear(event: Event): void {
+    event.stopPropagation();
+    this.validationRuleId = null;
+    this.name = '';
+    this.shortName = '';
+    this.description = '';
+    this.leftSideExpression = '';
+    this.leftSideDescription = '';
+
+    this.rightSideExpression = '';
+    this.rightSideDescription = '';
+    this.operator = null;
+    this.importance = null;
+    this.periodType = null;
+  }
+
   onSaveValidationRule(event: Event): void {
     event.stopPropagation();
-
+    const data = {
+      id: this.validationRuleId,
+      name: this.name,
+      shortName: this.shortName,
+      importance: this.importance['id'],
+      periodType: this.periodType['id'],
+      instructions: this.instruction,
+      description: this.description,
+      operator: this.operator['id'],
+      leftSide: {
+        expression: this.leftSideExpression,
+        description: this.leftSideDescription,
+      },
+      rightSide: {
+        expression: this.rightSideExpression,
+        description: this.leftSideDescription,
+      },
+    };
     this.dialog.open(SaveValidationModalComponent, {
       width: '40%',
-      data: {
-        name: this.name,
-      },
+      data,
+    });
+  }
+
+  changeTab(index) {
+    this.selectedTab.setValue(index);
+  }
+
+  onEditValidationRule(rule): void {
+    this.selectedTab.setValue(0);
+    this.validationRuleId = rule?.id;
+    this.validationRuleService
+      .getValidationRuleDetails(rule)
+      .subscribe((response) => {
+        if (response) {
+          this.name = response?.name;
+          this.shortName = response?.shortName;
+          this.description = response?.description;
+          this.leftSideExpression = response?.leftSide?.expression;
+          this.leftSideDescription = response?.leftSide?.description;
+
+          this.rightSideExpression = response?.rightSide?.expression;
+          this.rightSideDescription = response?.rightSide?.description;
+          this.operator = (this.operators.filter(
+            (operator) => operator?.id === response?.operator
+          ) || [])[0];
+          this.importance = (this.importanceOptions.filter(
+            (option) => option?.id === response?.importance
+          ) || [])[0];
+          this.periodType = (this.periodTypes.filter(
+            (periodType) => periodType?.id === response?.periodType
+          ) || [])[0];
+
+          // Get definition
+          this.expressionDescriptionRight$ =
+            this.metadataExpressionDescriptionService.getMetadataExpressionDescription(
+              this.rightSideExpression
+            );
+          this.expressionDescriptionLeft$ =
+            this.metadataExpressionDescriptionService.getMetadataExpressionDescription(
+              this.leftSideExpression
+            );
+        }
+
+        this.setColorsToElementsInExpressions(
+          this.leftSideExpression,
+          this.rightSideExpression
+        );
+      });
+  }
+
+  setColorsToElementsInExpressions(
+    leftSideExpression,
+    rightSideExpression
+  ): void {
+    const formulaPattern = /#\{.+?\}/g;
+    leftSideExpression.match(formulaPattern).forEach((elem) => {
+      const formElementToSetColor = elem.replace(/[#\{\}]/g, '');
+      if (formElementToSetColor.length < 14) {
+        this.dataElementService
+          .getDataElement(formElementToSetColor)
+          .subscribe((elemResponse) => {
+            if (elemResponse) {
+              elemResponse?.id +
+                '-' +
+                elemResponse?.categoryCombo?.categoryOptionCombos.forEach(
+                  (option) => {
+                    try {
+                      document.getElementById(
+                        option?.id + '-val'
+                      ).style.backgroundColor = '#36e1f2';
+                    } catch (e) {}
+                  }
+                );
+            }
+          });
+      } else {
+        document.getElementById(
+          formElementToSetColor.split('.').join('-') + '-val'
+        ).style.backgroundColor = '#36e1f2';
+      }
+    });
+
+    rightSideExpression.match(formulaPattern).forEach((elem) => {
+      const formElementToSetColor = elem.replace(/[#\{\}]/g, '');
+      if (formElementToSetColor.length < 14) {
+        this.dataElementService
+          .getDataElement(formElementToSetColor)
+          .subscribe((elemResponse) => {
+            if (elemResponse) {
+              elemResponse?.id +
+                '-' +
+                elemResponse?.categoryCombo?.categoryOptionCombos.forEach(
+                  (option) => {
+                    try {
+                      document.getElementById(
+                        option?.id + '-val'
+                      ).style.backgroundColor = '#3667f2';
+                    } catch (e) {}
+                  }
+                );
+            }
+          });
+      } else {
+        document.getElementById(
+          elem
+            .replace(/[#\{\}]/g, '')
+            .split('.')
+            .join('-') + '-val'
+        ).style.backgroundColor = '#3667f2';
+      }
     });
   }
 }

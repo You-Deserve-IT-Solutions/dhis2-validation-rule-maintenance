@@ -51,197 +51,318 @@
         ></div>
       </div>
       <di class="col-md-4" style="border-left: solid 1px #eee">
-        <div class="w-100 mb-2 mt-2 d-flex justify-content-end">
-          <button mat-stroked-button (click)="onSaveValidationRule($event)">
-            Save
-          </button>
-        </div>
-        <div class="validation-rule-form-container rule-form-create">
-          <mat-form-field class="w-100">
-            <mat-label>Name*</mat-label>
-            <input
-              name="name"
-              [(ngModel)]="name"
-              matInput
-              placeholder="Name*"
-            />
-          </mat-form-field>
+        <mat-tab-group
+          (selectedTabChange)="changeTab(selectedTab.value)"
+          [selectedIndex]="selectedTab.value"
+          (selectedIndexChange)="selectedTab.setValue($event)"
+        >
+          <mat-tab label="Create / Update">
+            <div class="p-2" *ngIf="selectedTab.value === 0">
+              <div class="w-100 mb-2 mt-2 d-flex justify-content-end">
+                <button
+                  mat-stroked-button
+                  (click)="onClear($event)"
+                  class="mr-2"
+                >
+                  Clear
+                </button>
+                <button
+                  [disabled]="
+                    !name ||
+                    !shortName ||
+                    !rightSideExpression ||
+                    !leftSideExpression ||
+                    !leftSideDescription ||
+                    !rightSideDescription ||
+                    !importance ||
+                    !periodType ||
+                    !operator
+                  "
+                  mat-stroked-button
+                  (click)="onSaveValidationRule($event)"
+                >
+                  Save
+                </button>
+              </div>
+              <div class="validation-rule-form-container rule-form-create">
+                <mat-form-field class="w-100">
+                  <mat-label>Name</mat-label>
+                  <input
+                    required
+                    name="name"
+                    [(ngModel)]="name"
+                    matInput
+                    placeholder="Name*"
+                  />
+                </mat-form-field>
 
-          <mat-form-field class="w-100">
-            <mat-label>Short name*</mat-label>
-            <input matInput placeholder="Short name*" />
-          </mat-form-field>
-          <mat-form-field class="w-100">
-            <mat-label>Description</mat-label>
-            <textarea matInput></textarea>
-          </mat-form-field>
+                <mat-form-field class="w-100">
+                  <mat-label>Short name</mat-label>
+                  <input
+                    [(ngModel)]="shortName"
+                    matInput
+                    max="50"
+                    placeholder="Short name*"
+                  />
+                </mat-form-field>
+                <mat-form-field class="w-100">
+                  <mat-label>Description</mat-label>
+                  <textarea [(ngModel)]="description" matInput></textarea>
+                </mat-form-field>
 
-          <mat-form-field class="w-100">
-            <mat-label>Instruction</mat-label>
-            <textarea matInput></textarea>
-          </mat-form-field>
+                <mat-form-field class="w-100">
+                  <mat-label>Instruction</mat-label>
+                  <textarea [(ngModel)]="instruction" matInput></textarea>
+                </mat-form-field>
 
-          <mat-form-field class="w-100">
-            <mat-label>Importance</mat-label>
-            <mat-select>
-              <mat-option
-                *ngFor="let option of importanceOptions"
-                [value]="option"
-                >{{ option?.name }}</mat-option
-              >
-            </mat-select>
-          </mat-form-field>
+                <mat-form-field class="w-100">
+                  <mat-label>Importance</mat-label>
+                  <mat-select [(ngModel)]="importance">
+                    <mat-option
+                      *ngFor="let option of importanceOptions"
+                      [value]="option"
+                      >{{ option?.name }}</mat-option
+                    >
+                  </mat-select>
+                </mat-form-field>
 
-          <br />
-          <h5>Left side</h5>
-          <div class="left-side">
-            <mat-form-field class="w-100">
-              <mat-label>Description*</mat-label>
-              <input matInput placeholder="Description" />
-            </mat-form-field>
-            <mat-form-field class="w-100">
-              <mat-label>Expression *</mat-label>
-              <textarea
-                id="left-side-expression"
-                (click)="setActiveExpressionArea($event, 'LEFT')"
-                matInput
-                rows="2"
-                [(ngModel)]="leftSideExpression"
-                (change)="getExpressionDefinition($event, 'LEFT')"
-              ></textarea>
-            </mat-form-field>
-            <div
-              class="w-100 d-flex justify-content-between sign-btns-container"
-            >
-              <button
-                (click)="getSignValue($event, '+', 'LEFT', leftSideExpression)"
-                class="sign-btns"
-              >
-                <img
-                  height="20"
-                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAABmJLR0QA/wD/AP+gvaeTAAAAWklEQVRoge3XsQ2AMAwAwcD+O0NPA02sF7obwMkrjbMWALCOzfOvqfPOXYOnCakRUiOkRkiNkBohNV+30ecWO+31nr95ESE1fog1QmqE1AipEVIjpEYIABB0A2/0Az6X8bpXAAAAAElFTkSuQmCC"
-                />
-              </button>
+                <mat-form-field class="w-100">
+                  <mat-label>Period type</mat-label>
+                  <mat-select [(ngModel)]="periodType">
+                    <mat-option
+                      *ngFor="let option of periodTypes"
+                      [value]="option"
+                      >{{ option?.name }}</mat-option
+                    >
+                  </mat-select>
+                </mat-form-field>
+
+                <br />
+                <h5>Left side</h5>
+                <div class="left-side">
+                  <mat-form-field class="w-100">
+                    <mat-label>Description</mat-label>
+                    <input
+                      required
+                      [(ngModel)]="leftSideDescription"
+                      matInput
+                      placeholder="Description"
+                    />
+                  </mat-form-field>
+                  <mat-form-field class="w-100">
+                    <mat-label>Expression</mat-label>
+                    <textarea
+                      required
+                      id="left-side-expression"
+                      (click)="setActiveExpressionArea($event, 'LEFT')"
+                      matInput
+                      rows="2"
+                      [(ngModel)]="leftSideExpression"
+                      (change)="getExpressionDefinition($event, 'LEFT')"
+                    ></textarea>
+                  </mat-form-field>
+                  <div
+                    class="
+                      w-100
+                      d-flex
+                      justify-content-left
+                      sign-btns-container
+                    "
+                  >
+                    <button
+                      (click)="
+                        getSignValue($event, '+', 'LEFT', leftSideExpression)
+                      "
+                      class="sign-btns"
+                    >
+                      <img
+                        height="20"
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAABmJLR0QA/wD/AP+gvaeTAAAAWklEQVRoge3XsQ2AMAwAwcD+O0NPA02sF7obwMkrjbMWALCOzfOvqfPOXYOnCakRUiOkRkiNkBohNV+30ecWO+31nr95ESE1fog1QmqE1AipEVIjpEYIABB0A2/0Az6X8bpXAAAAAElFTkSuQmCC"
+                      />
+                    </button>
+                    <button
+                      (click)="
+                        getSignValue($event, '-', 'LEFT', leftSideExpression)
+                      "
+                      class="sign-btns"
+                    >
+                      <img
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAAAJUlEQVRIiWNgGAWjYBSMAoKAEY3/n9rmMlHJwFEwCkbBKKAEAAD0EQEED0po+gAAAABJRU5ErkJggg=="
+                      />
+                    </button>
+                  </div>
+                  <p
+                    [ngClass]="{
+                      'text-danger':
+                        params?.expressionDescriptionLeft?.status === 'ERROR'
+                    }"
+                  >
+                    {{
+                      params?.expressionDescriptionLeft?.status === 'OK'
+                        ? params?.expressionDescriptionLeft?.description
+                        : params?.expressionDescriptionLeft?.message
+                    }}
+                  </p>
+                  <p>
+                    <mat-progress-bar
+                      *ngIf="
+                        !params?.expressionDescriptionLeft &&
+                        leftSideExpression &&
+                        leftSideExpression !== ''
+                      "
+                      mode="indeterminate"
+                    ></mat-progress-bar>
+                  </p>
+                </div>
+                <br />
+
+                <mat-form-field class="w-100">
+                  <mat-label>Operator</mat-label>
+                  <mat-select required [(ngModel)]="operator">
+                    <mat-option
+                      *ngFor="let option of operators"
+                      [value]="option"
+                      >{{ option?.name }}</mat-option
+                    >
+                  </mat-select>
+                </mat-form-field>
+
+                <br />
+                <h5>Right side</h5>
+                <div class="right-side">
+                  <mat-form-field class="w-100">
+                    <mat-label>Description</mat-label>
+                    <input
+                      required
+                      [(ngModel)]="rightSideDescription"
+                      matInput
+                      placeholder="Description"
+                    />
+                  </mat-form-field>
+
+                  <mat-form-field class="w-100">
+                    <mat-label>Expression</mat-label>
+                    <textarea
+                      required
+                      id="right-side-expression"
+                      (click)="setActiveExpressionArea($event, 'RIGHT')"
+                      matInput
+                      [(ngModel)]="rightSideExpression"
+                      (change)="getExpressionDefinition($event, 'RIGHT')"
+                      rows="2"
+                    ></textarea>
+                  </mat-form-field>
+
+                  <div
+                    class="
+                      w-100
+                      d-flex
+                      justify-content-left
+                      sign-btns-container
+                    "
+                  >
+                    <button
+                      (click)="
+                        getSignValue($event, '+', 'RIGHT', rightSideExpression)
+                      "
+                      class="sign-btns"
+                    >
+                      <img
+                        height="20"
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAABmJLR0QA/wD/AP+gvaeTAAAAWklEQVRoge3XsQ2AMAwAwcD+O0NPA02sF7obwMkrjbMWALCOzfOvqfPOXYOnCakRUiOkRkiNkBohNV+30ecWO+31nr95ESE1fog1QmqE1AipEVIjpEYIABB0A2/0Az6X8bpXAAAAAElFTkSuQmCC"
+                      />
+                    </button>
+
+                    <button
+                      (click)="
+                        getSignValue($event, '-', 'RIGHT', rightSideExpression)
+                      "
+                      class="sign-btns"
+                    >
+                      <img
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAAAJUlEQVRIiWNgGAWjYBSMAoKAEY3/n9rmMlHJwFEwCkbBKKAEAAD0EQEED0po+gAAAABJRU5ErkJggg=="
+                      />
+                    </button>
+                  </div>
+                  <p
+                    [ngClass]="{
+                      'text-danger':
+                        params?.expressionDescriptionRight?.status === 'ERROR'
+                    }"
+                  >
+                    {{
+                      params?.expressionDescriptionRight?.status === 'OK'
+                        ? params?.expressionDescriptionRight?.description
+                        : params?.expressionDescriptionRight?.message
+                    }}
+                  </p>
+                  <p>
+                    <mat-progress-bar
+                      *ngIf="
+                        !params?.expressionDescriptionRight &&
+                        rightSideExpression &&
+                        rightSideExpression != ''
+                      "
+                      mode="indeterminate"
+                    ></mat-progress-bar>
+                  </p>
+                </div>
+
+                <br />
+
+                <div>
+                  <h5>Organisation unit levels</h5>
+                  <div class="row">
+                    <div class="col-5"></div>
+                    <div class="col-2"></div>
+                    <div class="col-5"></div>
+                  </div>
+                </div>
+
+                <br />
+                <section>
+                  <mat-checkbox
+                    >Skip this rule during form validation</mat-checkbox
+                  >
+                </section>
+              </div>
+              <div class="d-flex justify-content-end">
+                <button
+                  mat-stroked-button
+                  (click)="onClear($event)"
+                  class="mr-2"
+                >
+                  Clear
+                </button>
+                <button
+                  [disabled]="
+                    !name ||
+                    !shortName ||
+                    !rightSideExpression ||
+                    !leftSideExpression ||
+                    !leftSideDescription ||
+                    !rightSideDescription ||
+                    !importance ||
+                    !periodType ||
+                    !operator
+                  "
+                  class="mr-2"
+                  mat-stroked-button
+                  (click)="onSaveValidationRule($event)"
+                >
+                  Save
+                </button>
+              </div>
             </div>
-            <p
-              [ngClass]="{
-                'text-danger':
-                  params?.expressionDescriptionLeft?.status === 'ERROR'
-              }"
-            >
-              {{
-                params?.expressionDescriptionLeft?.status === 'OK'
-                  ? params?.expressionDescriptionLeft?.description
-                  : params?.expressionDescriptionLeft?.message
-              }}
-            </p>
-            <p>
-              <mat-progress-bar
-                *ngIf="
-                  !params?.expressionDescriptionLeft &&
-                  leftSideExpression &&
-                  leftSideExpression !== ''
-                "
-                mode="indeterminate"
-              ></mat-progress-bar>
-            </p>
-          </div>
-          <br />
-
-          <mat-form-field class="w-100">
-            <mat-label>Operator</mat-label>
-            <mat-select>
-              <mat-option *ngFor="let option of operators" [value]="option">{{
-                option?.name
-              }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <br />
-          <h5>Right side</h5>
-          <div class="right-side">
-            <mat-form-field class="w-100">
-              <mat-label>Description*</mat-label>
-              <input matInput placeholder="Description" />
-            </mat-form-field>
-
-            <mat-form-field class="w-100">
-              <mat-label>Expression*</mat-label>
-              <textarea
-                id="right-side-expression"
-                (click)="setActiveExpressionArea($event, 'RIGHT')"
-                matInput
-                [(ngModel)]="rightSideExpression"
-                (change)="getExpressionDefinition($event, 'RIGHT')"
-                rows="2"
-              ></textarea>
-            </mat-form-field>
-
-            <div
-              class="w-100 d-flex justify-content-between sign-btns-container"
-            >
-              <button
-                (click)="
-                  getSignValue($event, '+', 'RIGHT', rightSideExpression)
-                "
-                class="sign-btns"
-              >
-                <img
-                  height="20"
-                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAABmJLR0QA/wD/AP+gvaeTAAAAWklEQVRoge3XsQ2AMAwAwcD+O0NPA02sF7obwMkrjbMWALCOzfOvqfPOXYOnCakRUiOkRkiNkBohNV+30ecWO+31nr95ESE1fog1QmqE1AipEVIjpEYIABB0A2/0Az6X8bpXAAAAAElFTkSuQmCC"
-                />
-              </button>
+          </mat-tab>
+          <mat-tab label="Validation rule">
+            <div class="p-2" *ngIf="selectedTab.value === 1">
+              <app-validation-rules-list-container
+                (editValidationRule)="onEditValidationRule($event)"
+              ></app-validation-rules-list-container>
             </div>
-            <p
-              [ngClass]="{
-                'text-danger':
-                  params?.expressionDescriptionRight?.status === 'ERROR'
-              }"
-            >
-              {{
-                params?.expressionDescriptionRight?.status === 'OK'
-                  ? params?.expressionDescriptionRight?.description
-                  : params?.expressionDescriptionRight?.message
-              }}
-            </p>
-            <p>
-              <mat-progress-bar
-                *ngIf="
-                  !params?.expressionDescriptionRight &&
-                  rightSideExpression &&
-                  rightSideExpression != ''
-                "
-                mode="indeterminate"
-              ></mat-progress-bar>
-            </p>
-          </div>
-
-          <br />
-
-          <div>
-            <h5>Organisation unit levels</h5>
-            <div class="row">
-              <div class="col-5"></div>
-              <div class="col-2"></div>
-              <div class="col-5"></div>
-            </div>
-          </div>
-
-          <br />
-          <section>
-            <mat-checkbox>Skip this rule during form validation</mat-checkbox>
-          </section>
-        </div>
-        <div class="d-flex justify-content-end">
-          <!-- <button mat-stroked-button class="mr-2">Cancel</button> -->
-          <button
-            class="mr-2"
-            mat-stroked-button
-            (click)="onSaveValidationRule($event)"
-          >
-            Save
-          </button>
-        </div>
+          </mat-tab>
+        </mat-tab-group>
       </di>
     </div>
   </div>

@@ -1,0 +1,15 @@
+<div
+  class="mt-2"
+  *ngIf="{ validationRules: validationRules$ | async } as params"
+>
+  <mat-progress-bar
+    mode="indeterminate"
+    *ngIf="!params?.validationRules"
+  ></mat-progress-bar>
+  <div *ngIf="params?.validationRules">
+    <app-validation-rules-list
+      [validationRules]="params?.validationRules"
+      (editValidation)="onEditValidationRule($event)"
+    ></app-validation-rules-list>
+  </div>
+</div>

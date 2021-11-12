@@ -25,6 +25,8 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   imports: [
@@ -53,6 +55,8 @@ import { MatDialogModule } from '@angular/material/dialog';
     DragDropModule,
     MatProgressSpinnerModule,
     MatDialogModule,
+    MatMenuModule,
+    MatIconModule,
   ],
   exports: [
     ReactiveFormsModule,
@@ -79,6 +83,8 @@ import { MatDialogModule } from '@angular/material/dialog';
     DragDropModule,
     MatProgressSpinnerModule,
     MatDialogModule,
+    MatMenuModule,
+    MatIconModule,
     ...sharedComponents,
   ],
   declarations: [...sharedComponents],
