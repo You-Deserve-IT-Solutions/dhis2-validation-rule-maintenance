@@ -251,6 +251,9 @@ export class FormatCustomFormComponent implements OnInit {
   onEditValidationRule(rule): void {
     this.selectedTab.setValue(0);
     this.validationRuleId = rule?.id;
+    document.getElementsByName('entryfield').forEach((elem, index) => {
+      elem.style.backgroundColor = '#FFF';
+    });
     this.validationRuleService
       .getValidationRuleDetails(rule)
       .subscribe((response) => {
