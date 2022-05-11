@@ -3,12 +3,13 @@
   class="row"
   *ngIf="{
     expressionDescriptionLeft: expressionDescriptionLeft$ | async,
-    expressionDescriptionRight: expressionDescriptionRight$ | async
+    expressionDescriptionRight: expressionDescriptionRight$ | async,
+    dataSets: dataSets$ | async
   } as params"
 >
   <div class="col-12">
     <div>
-      <mat-form-field
+      <!-- <mat-form-field
         class="w-100 dataset-form-full-width"
         style="margin-top: -1rem"
       >
@@ -17,34 +18,37 @@
           name="searchString"
           placeholder="Select form"
         >
-          <!-- <ngx-mat-select-search name="search"></ngx-mat-select-search> -->
           <mat-option *ngFor="let option of dataSets" [value]="option">
             {{ option.name }}
           </mat-option>
         </mat-select>
-      </mat-form-field>
-
-      <!-- <mat-form-field class="w-100">
-        <mat-select
-          [formControl]="dataset"
-          placeholder="Select form"
-          #singleSelect
-        >
-          <mat-option>
-            <ngx-mat-select-search
-              [formControl]="dataSetCtrl"
-              name="search"
-              [(ngModel)]="searchString"
-            ></ngx-mat-select-search>
-          </mat-option>
-          <mat-option *ngFor="let dataset of dataSets" [value]="dataset">
-            {{ dataset?.name }}
-          </mat-option>
-        </mat-select>
       </mat-form-field> -->
+
+      <mat-form-field class="w-100" appearance="fill">
+        <mat-label>Datasets</mat-label>
+        <input
+          type="text"
+          placeholder="Search"
+          [required]="true"
+          matInput
+          autocomplete="off"
+          (keyup)="searchItem($event)"
+          [matAutocomplete]="auto"
+        />
+        <mat-autocomplete
+          autoActiveFirstOption
+          #auto="matAutocomplete"
+          (optionSelected)="getSelectedItemFromOption($event)"
+          [displayWith]="displayFunction.bind(this)"
+        >
+          <mat-option *ngFor="let option of params?.dataSets" [value]="option">
+            {{ option?.name }}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
     </div>
     <div class="row" *ngIf="_htmlMarkup">
-      <div class="col-md-8">
+      <div class="col-md-8 html-form">
         <div
           style="width: 100%; height: 80vh; overflow: auto"
           [innerHtml]="_htmlMarkup"
@@ -167,12 +171,7 @@
                     ></textarea>
                   </mat-form-field>
                   <div
-                    class="
-                      w-100
-                      d-flex
-                      justify-content-left
-                      sign-btns-container
-                    "
+                    class="w-100 d-flex justify-content-left sign-btns-container"
                   >
                     <button
                       (click)="
@@ -264,12 +263,7 @@
                   </mat-form-field>
 
                   <div
-                    class="
-                      w-100
-                      d-flex
-                      justify-content-left
-                      sign-btns-container
-                    "
+                    class="w-100 d-flex justify-content-left sign-btns-container"
                   >
                     <button
                       (click)="

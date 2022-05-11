@@ -9,9 +9,15 @@ import { map } from 'rxjs/operators';
 export class ValidationRulesService {
   constructor(private httpClient: NgxDhis2HttpClientService) {}
 
-  getValidationRules(): Observable<any> {
+  getValidationRules(searchingText?: string): Observable<any[]> {
     return this.httpClient
-      .get('validationRules.json?fields=id,name')
+      .get(
+        `validationRules.json?fields=id,name&pageSize=10&paging=true${
+          searchingText
+            ? '&filter=name:ilike:' + searchingText.toLowerCase()
+            : ''
+        }`
+      )
       .pipe(map((response) => response?.validationRules));
   }
 

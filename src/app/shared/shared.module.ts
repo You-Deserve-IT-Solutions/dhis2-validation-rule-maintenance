@@ -27,6 +27,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 @NgModule({
   imports: [
@@ -57,6 +58,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatDialogModule,
     MatMenuModule,
     MatIconModule,
+    MatAutocompleteModule,
   ],
   exports: [
     ReactiveFormsModule,
@@ -85,6 +87,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatDialogModule,
     MatMenuModule,
     MatIconModule,
+    MatAutocompleteModule,
     ...sharedComponents,
   ],
   declarations: [...sharedComponents],

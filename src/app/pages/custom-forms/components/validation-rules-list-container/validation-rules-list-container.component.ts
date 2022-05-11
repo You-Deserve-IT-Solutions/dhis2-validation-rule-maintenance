@@ -8,13 +8,10 @@ import { ValidationRulesService } from 'src/app/core/services/validation-rules.s
   styleUrls: ['./validation-rules-list-container.component.css'],
 })
 export class ValidationRulesListContainerComponent implements OnInit {
-  validationRules$: Observable<any[]>;
   @Output() editValidationRule = new EventEmitter<any>();
-  constructor(private validationRulesService: ValidationRulesService) {}
+  constructor() {}
 
-  ngOnInit(): void {
-    this.validationRules$ = this.validationRulesService.getValidationRules();
-  }
+  ngOnInit(): void {}
 
   onEditValidationRule(validationRule): void {
     this.editValidationRule.emit(validationRule);
