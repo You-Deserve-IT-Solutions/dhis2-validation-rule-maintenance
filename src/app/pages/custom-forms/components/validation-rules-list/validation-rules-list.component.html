@@ -42,8 +42,16 @@
             </button>
             <mat-menu #menu="matMenu">
               <button (click)="onEdit($event, validationRule)" mat-menu-item>
-                <mat-icon>view</mat-icon>
-                <span>View</span>
+                <mat-icon>edit</mat-icon>
+                <span>Edit</span>
+              </button>
+              <button
+                disabled="disabled"
+                (click)="onDelete($event, validationRule)"
+                mat-menu-item
+              >
+                <mat-icon>delete</mat-icon>
+                <span>Delete</span>
               </button>
             </mat-menu>
           </td>

@@ -31,7 +31,10 @@ export class ValidationRulesListComponent implements OnInit {
     this.editValidation.emit(validationRule);
   }
 
-  onDelete(validationRule): void {
+  onDelete(event?: Event, validationRule?: any): void {
+    if (event) {
+      event.stopPropagation();
+    }
     this.deleteValidation.emit(validationRule);
   }
 }
